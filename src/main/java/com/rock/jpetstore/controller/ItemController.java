@@ -72,11 +72,12 @@ public class ItemController {
 			itemservice.delete(itemid);
 
 			map.put("result", "OK");
+			map.put("itemid", itemid);
+			return new ResponseEntity<>(map, headers, HttpStatus.ACCEPTED);
 		} catch (Exception e) {
 			map.put("result", "NOK");
-		}
-
-		return new ResponseEntity<>(map, headers, HttpStatus.ACCEPTED);
+			return new ResponseEntity<>(map, headers, HttpStatus.NO_CONTENT);
+		} 
 	}
 
 	@RequestMapping(value = "/items", consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
@@ -92,12 +93,12 @@ public class ItemController {
 			itemservice.save(items);
 
 			map.put("result", "OK");
+			map.put("items", items);
+			return new ResponseEntity<>(map, headers, HttpStatus.CREATED);
 		} catch (Exception e) {
 			map.put("result", "NOK");
 			return new ResponseEntity<>(map, headers, HttpStatus.BAD_REQUEST);
-		}
-
-		return new ResponseEntity<>(map, headers, HttpStatus.CREATED);
+		} 
 	}
 
 	@RequestMapping(value = "/items/{itemid}", consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
@@ -113,11 +114,11 @@ public class ItemController {
 			itemservice.save(items);
 
 			map.put("result", "OK");
+			map.put("items", items);
+			return new ResponseEntity<>(map, headers, HttpStatus.CREATED);
 		} catch (Exception e) {
 			map.put("result", "NOK");
 			return new ResponseEntity<>(map, headers, HttpStatus.BAD_REQUEST);
-		}
-
-		return new ResponseEntity<>(map, headers, HttpStatus.CREATED);
+		} 
 	}
 }
