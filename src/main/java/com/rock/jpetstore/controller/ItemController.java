@@ -98,7 +98,7 @@ public class ItemController {
 	                //System.out.println(new_items);
 	            	
 	                // return it as a String
-	    			return new ResponseEntity<>(new_inventories, headers, HttpStatus.OK);
+	    			return new ResponseEntity<>(new_inventories.get(0), headers, HttpStatus.OK);
 	                
 	            }
 	        } finally {
