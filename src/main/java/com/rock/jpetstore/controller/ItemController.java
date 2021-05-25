@@ -1,16 +1,26 @@
 package com.rock.jpetstore.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rock.jpetstore.domain.Inventories;
 import com.rock.jpetstore.domain.Items;
 import com.rock.jpetstore.service.ItemService;
 
@@ -25,6 +35,9 @@ public class ItemController {
 	@Autowired
 	private ItemService itemservice;
 
+	@Value("${inventory.server.url}")
+	private String inventoryServer;
+	
 	// @ResponseStatus(HttpStatus.OK)
 	@RequestMapping(value = "/items", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
 	public ResponseEntity<Object> all() throws Exception {
@@ -42,6 +55,63 @@ public class ItemController {
 		}
 	}
 
+
+	@RequestMapping(value = "/items/{itemid}/inventories", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public ResponseEntity<Object> get_inventories(@PathVariable String itemid) throws Exception {
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/json");
+		headers.add("Retry-After", "3600");
+ 
+  		CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        
+		try {
+ 		    //HttpGet request = new HttpGet("http://127.0.0.1:8082/items");
+			HttpGet request = new HttpGet(inventoryServer);
+
+		    request.addHeader("api-key", "change-key");
+	        request.addHeader(HttpHeaders.USER_AGENT, "Googlebot");
+	  
+	        
+	        CloseableHttpResponse response = httpClient.execute(request);
+	        
+	        try { 
+
+                HttpEntity entity = response.getEntity(); 
+	                
+	            if (entity != null) {
+
+	                String result = EntityUtils.toString(entity);
+	                //System.out.println(result); 
+	                
+	            	ObjectMapper mapper = new ObjectMapper(); 
+	            	Inventories[] inventories = mapper.readValue(result, Inventories[].class);
+	            	ArrayList<Inventories> new_inventories = new ArrayList<Inventories>();
+	            	for (Inventories i : inventories) {
+	            		if(i.getItemId().equals(itemid)) {
+	            			//System.out.println(i);
+	            			new_inventories.add(i);
+	            		}
+	                }
+
+	                //System.out.println(new_items);
+	            	
+	                // return it as a String
+	    			return new ResponseEntity<>(new_inventories, headers, HttpStatus.OK);
+	                
+	            }
+	        } finally {
+                response.close();
+            }
+		} finally {
+			httpClient.close();
+        }
+     
+		// return new ResponseEntity<>("{}", headers, HttpStatus.OK);
+		return new ResponseEntity<>(null, headers, HttpStatus.NOT_FOUND);		
+	}
+	
 	@RequestMapping(value = "/items/{itemid}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
 	public ResponseEntity<Object> get(@PathVariable String itemid) throws Exception {
 
