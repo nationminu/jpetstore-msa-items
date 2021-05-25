@@ -31,6 +31,14 @@ public class Items {
 		this.itemId = itemId.trim();
 	}
  
+	public String getProductId() {
+		return productId;
+	}
+
+	public void setProductId(String productId) {
+		this.productId = productId.trim();
+	}
+
 	public int getSupplier() {
 		return supplier;
 	}
