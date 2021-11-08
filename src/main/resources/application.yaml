@@ -51,4 +51,6 @@ logging.level.com.rock.jpetstore: ERROR
 springdoc.swagger-ui.path: /swagger.html
 springdoc.swagger-ui.operationsSorter: method
 
+inventory.server.url: ${inventory.endpoint:localhost:8080/inventories} 
+
 management.endpoints.web.exposure.include: health,info,prometheus
